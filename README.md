@@ -61,7 +61,7 @@ youtube-rag-system/
 Clone the repository
 
 ```
-git clone https://github.com/yourusername/youtube-rag-system.git
+git clone https://github.com/bhoopenderbaghel/YouTube-Video-QA-Chatbot.git
 cd youtube-rag-system
 ```
 
