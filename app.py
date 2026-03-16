@@ -1,3 +1,5 @@
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.chat_history import InMemoryChatMessageHistory
 from dotenv import load_dotenv
 from src.transcript_loader import get_transcript
 from src.text_splitter import split_text
@@ -7,7 +9,18 @@ from src.retriever import get_retriever
 from src.rag_chain import create_rag_chain
 from utils.youtube_utils import extract_video_id
 
+
 load_dotenv()
+
+
+store = {}
+
+def get_session_history(session_id):
+
+    if session_id not in store:
+        store[session_id] = InMemoryChatMessageHistory()
+
+    return store[session_id]
 
 
 url = input("Enter YouTube URL: ")
@@ -26,8 +39,30 @@ retriever = get_retriever(vector_store)
 
 rag_chain = create_rag_chain(retriever)
 
-question = input("Ask a question: ")
 
-answer = rag_chain.invoke(question)
+rag_with_memory = RunnableWithMessageHistory(
+    rag_chain,
+    get_session_history,
+    input_messages_key="question",
+    history_messages_key="chat_history",
+)
 
-print(answer)
+
+session_id = input("Enter user id: ")
+
+
+while True:
+
+    question = input("\nAsk a question (type 'exit' to quit): ")
+
+    if question.lower() == "exit":
+        break
+
+    answer = rag_with_memory.invoke(
+        {"question": question},
+        config={"configurable": {"session_id": session_id}}
+    )
+
+    print("\nAI:", answer)
+
+    print(store)

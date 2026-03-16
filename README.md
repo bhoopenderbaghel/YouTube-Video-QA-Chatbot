@@ -1,7 +1,7 @@
 # RAG-based YouTube Video QA & Summarization System
 
 A Retrieval-Augmented Generation (RAG) application that converts YouTube video transcripts into a searchable knowledge base.
-The system allows users to ask questions or generate summaries from video content using semantic retrieval and LLMs.
+The system allows users to ask questions, generate summaries, and have **multi-turn conversations about video content** using semantic retrieval and LLMs.
 
 ---
 
@@ -13,6 +13,8 @@ The system allows users to ask questions or generate summaries from video conten
 * Stores vectors in a **FAISS vector database**
 * Uses **Retrieval-Augmented Generation (RAG)** for context-grounded answers
 * Supports **question answering and video summarization**
+* Maintains **conversation memory for follow-up questions**
+* Supports **multi-user sessions with isolated chat histories**
 
 ---
 
@@ -20,11 +22,13 @@ The system allows users to ask questions or generate summaries from video conten
 
 User Query
 ↓
+Session-based Chat Memory
+↓
 Retriever (FAISS similarity search)
 ↓
 Relevant Transcript Chunks
 ↓
-Prompt Template
+Prompt Template (Context + Chat History)
 ↓
 LLM (GPT-4o-mini)
 ↓
@@ -35,11 +39,12 @@ Final Answer / Summary
 ## ⚙️ Tech Stack
 
 * **Python**
-* **LangChain**
+* **LangChain (Runnable-based pipelines)**
 * **OpenAI API (GPT-4o-mini, text-embedding-3-small)**
 * **FAISS Vector Database**
 * **YouTube Transcript API**
 * **Retrieval-Augmented Generation (RAG)**
+* **Session-based Conversation Memory**
 
 ---
 
@@ -48,7 +53,18 @@ Final Answer / Summary
 ```
 youtube-rag-system/
 │
-├── app.py
+├── app.py                     # Main application
+├── src/
+│   ├── transcript_loader.py  # Fetch YouTube captions
+│   ├── text_splitter.py      # Chunk transcript text
+│   ├── embeddings.py         # Embedding model
+│   ├── vector_store.py       # FAISS vector store
+│   ├── retriever.py          # Document retriever
+│   └── rag_chain.py          # RAG pipeline
+│
+├── utils/
+│   └── youtube_utils.py      # Extract YouTube video ID
+│
 ├── requirements.txt
 ├── .env
 └── README.md
@@ -62,7 +78,7 @@ Clone the repository
 
 ```
 git clone https://github.com/bhoopenderbaghel/YouTube-Video-QA-Chatbot.git
-cd youtube-rag-system
+cd YouTube-Video-QA-Chatbot
 ```
 
 Install dependencies
@@ -87,11 +103,17 @@ Run the script:
 python app.py
 ```
 
-Example query:
+Enter a YouTube video URL and start asking questions about the video.
+
+Example queries:
 
 ```
-can you summarize the video
+Can you summarize the video?
+What topics are discussed?
+Explain the concept of attention mentioned in the video.
 ```
+
+You can also ask **follow-up questions**, and the system will use conversation history to maintain context.
 
 ---
 
@@ -100,16 +122,18 @@ can you summarize the video
 * Summarizing long educational videos
 * Asking questions about lecture content
 * Extracting key insights from technical talks
+* Conversational exploration of video knowledge
 * Building searchable video knowledge bases
 
 ---
 
 ## 📈 Future Improvements
 
-* Support **any YouTube URL input**
-* Add **Streamlit UI for interactive chat**
-* Implement **persistent vector database**
-* Add **conversation memory**
+* Add **Streamlit UI for an interactive chatbot**
+* Implement **persistent FAISS vector storage per video**
+* Add **hybrid search (BM25 + vector retrieval)**
+* Support **automatic transcript translation for multilingual videos**
+* Deploy as an **API or web application**
 
 ---
 
@@ -118,4 +142,3 @@ can you summarize the video
 **Bhoopender Baghel**
 
 AI / GenAI Projects
-

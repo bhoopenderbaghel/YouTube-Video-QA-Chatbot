@@ -14,18 +14,26 @@ def create_rag_chain(retriever):
 
     prompt = PromptTemplate(
         template="""
-        Answer ONLY from the provided context.
+You are a helpful assistant.
 
-        {context}
+Answer ONLY from the provided transcript context.
 
-        Question: {question}
-        """,
-        input_variables=["context","question"]
+Chat History:
+{chat_history}
+
+Context:
+{context}
+
+Question:
+{question}
+""",
+        input_variables=["chat_history", "context", "question"]
     )
 
     parallel = RunnableParallel({
-        "question": RunnablePassthrough(),
-        "context": retriever | RunnableLambda(format_docs)
+        "question": RunnableLambda(lambda x: x["question"]),
+        "context": RunnableLambda(lambda x: x["question"]) | retriever | RunnableLambda(format_docs),
+        "chat_history": RunnableLambda(lambda x: x["chat_history"])
     })
 
     parser = StrOutputParser()
